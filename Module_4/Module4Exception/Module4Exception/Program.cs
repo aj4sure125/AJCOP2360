@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO; // Required for file logging
 
 class Program
 {
@@ -12,39 +13,49 @@ class Program
 
         try
         {
-            int number1 = Convert.ToInt32(input1);
-            int number2 = Convert.ToInt32(input2);
+            long number1 = Convert.ToInt64(input1);
+            long number2 = Convert.ToInt64(input2);
 
-            int result = Divide(number1, number2);
-            Console.WriteLine($"The result of {number1} divided by {number2} is: {result}");
+            long result = Divide(number1, number2);
+            Console.WriteLine($"✅ SUCCESS: {number1} divided by {number2} is: {result}");
         }
         catch (FormatException ex)
         {
-            Console.WriteLine("Error: One or both of the inputs are not valid integers.");
-            Console.WriteLine($"Detailed error message: {ex.Message}");
+            string errorMessage = $"❌ ERROR: Invalid input. '{input1}' or '{input2}' is not a valid number.";
+            Console.WriteLine(errorMessage);
+            LogError(errorMessage, ex);
         }
         catch (DivideByZeroException ex)
         {
-            Console.WriteLine("Error: No dividing by zero! That is how computers explode. Meanie.");
-            Console.WriteLine($"Detailed error message: {ex.Message}");
+            string errorMessage = $"❌ ERROR: Division by zero is not allowed. You entered: {input1} and {input2}.";
+            Console.WriteLine(errorMessage);
+            LogError(errorMessage, ex);
         }
         catch (OverflowException ex)
         {
-            Console.WriteLine("Error: The number entered is too large or too small.");
-            Console.WriteLine($"Detailed error message: {ex.Message}");
+            string errorMessage = $"❌ ERROR: The number is too large or too small. You entered: {input1} or {input2}.";
+            Console.WriteLine(errorMessage);
+            LogError(errorMessage, ex);
         }
         catch (Exception ex)
         {
-            Console.WriteLine("An unexpected error occurred.");
-            Console.WriteLine($"Detailed error message: {ex.Message}");
+            string errorMessage = $"❌ ERROR: An unexpected error occurred: {ex.Message}";
+            Console.WriteLine(errorMessage);
+            LogError(errorMessage, ex);
         }
 
         Console.WriteLine("Press any key to exit...");
         Console.ReadKey();
     }
 
-    static int Divide(int a, int b)
+    static long Divide(long a, long b)
     {
         return a / b;
+    }
+
+    static void LogError(string message, Exception ex)
+    {
+        string logMessage = $"{DateTime.Now}: {message}\nException Details: {ex}\n";
+        File.AppendAllText("error_log.txt", logMessage);
     }
 }
